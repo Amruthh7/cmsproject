@@ -12,7 +12,7 @@ export function CustomerPortfolio() {
   useEffect(() => {
     const interval = setInterval(() => {
       setScrollPosition((prev) => (prev + 1) % 100);
-    }, 50);
+    }, 150);
 
     return () => clearInterval(interval);
   }, []);
