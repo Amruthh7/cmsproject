@@ -1,21 +1,13 @@
-import { useEffect, useState } from "react";
+import React from "react";
 
 export function CustomerPortfolio() {
-  const [scrollPosition, setScrollPosition] = useState(0);
-
   const customers = [
-    "Microsoft", "Amazon", "Google", "Apple", "Netflix",
-    "Spotify", "Adobe", "Salesforce", "Oracle", "IBM",
-    "Meta", "Twitter", "LinkedIn", "Uber", "Airbnb"
+    "Microsoft","Amazon","Google","Apple","Netflix","Spotify","Adobe",
+    "Salesforce","Oracle","IBM","Meta","Twitter","LinkedIn","Uber","Airbnb",
   ];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setScrollPosition((prev) => (prev + 1) % 100);
-    }, 150);
-
-    return () => clearInterval(interval);
-  }, []);
+  // Duplicate for seamless scroll
+  const scrollingCustomers = [...customers, ...customers];
 
   return (
     <section className="py-20 overflow-hidden bg-secondary/30 border-y border-border">
@@ -29,27 +21,15 @@ export function CustomerPortfolio() {
           </p>
         </div>
 
-        {/* Scrolling logo container */}
-        <div className="relative">
-          <div className="flex overflow-hidden">
-            <div
-              className="flex animate-scroll gap-16 items-center"
-              style={{
-                transform: `translateX(-${scrollPosition}%)`,
-                transition: "transform 0.05s linear",
-              }}
-            >
-              {[...customers, ...customers, ...customers].map((customer, index) => (
-                <div
-                  key={index}
-                  className="flex-shrink-0 px-8 py-4 hover:scale-110 transition-transform duration-300"
-                >
-                  <div className="text-2xl font-bold text-muted-foreground/60 hover:text-foreground transition-colors duration-300 whitespace-nowrap">
-                    {customer}
-                  </div>
+        <div className="relative overflow-hidden">
+          <div className="flex gap-16 items-center animate-scroll">
+            {scrollingCustomers.map((customer, index) => (
+              <div key={index} className="flex-shrink-0 px-8 py-4 hover:scale-110 transition-transform duration-300">
+                <div className="text-2xl font-bold text-muted-foreground/60 hover:text-foreground transition-colors duration-300 whitespace-nowrap">
+                  {customer}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
 
           {/* Gradient overlays */}
