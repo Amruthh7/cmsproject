@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sparkles, Zap } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -10,7 +10,8 @@ export function Header() {
   const navItems = [
     { label: "Features", href: "/features" },
     { label: "Pricing", href: "/pricing" },
-    { label: "About", href: "/about" }
+    { label: "About", href: "/about" },
+    { label: "Career", href: "/career" }
   ];
 
   return (
@@ -19,10 +20,13 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <div className="w-5 h-5 bg-white rounded"></div>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg shadow-blue-500/30">
+              <Zap className="w-6 h-6 text-white group-hover:rotate-12 transition-transform duration-300" />
             </div>
-            <span className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">FlowStack</span>
+            <div className="text-2xl font-bold group-hover:scale-105 transition-transform duration-300">
+              <span className="text-white">The</span>
+              <span className="text-blue-400"> Content</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -34,8 +38,8 @@ export function Header() {
                   key={item.label}
                   to={item.href}
                   className={`transition-colors duration-200 font-medium ${
-                    isActive 
-                      ? 'text-primary' 
+                    isActive
+                      ? 'text-primary'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -83,8 +87,8 @@ export function Header() {
                     key={item.label}
                     to={item.href}
                     className={`transition-colors duration-200 font-medium py-2 ${
-                      isActive 
-                        ? 'text-primary' 
+                      isActive
+                        ? 'text-primary'
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                     onClick={() => setIsMenuOpen(false)}

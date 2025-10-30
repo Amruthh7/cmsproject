@@ -1,257 +1,429 @@
+import React from "react";
 import { Header } from "@/components/Header";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  Users, 
-  Target, 
-  Award, 
-  Globe, 
-  Heart, 
-  Lightbulb,
-  Shield,
-  Rocket,
-  ArrowRight
-} from "lucide-react";
+import { Users, Award, Globe, Heart, ArrowRight, Sparkles, Zap, Shield, RefreshCw } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAboutPageContent } from "@/hooks/useContentstack";
+import { useQueryClient } from "@tanstack/react-query";
 
 const About = () => {
-  const stats = [
-    { number: "10M+", label: "Content Requests Daily", icon: <Globe className="w-6 h-6" /> },
-    { number: "150+", label: "Countries Served", icon: <Award className="w-6 h-6" /> },
-    { number: "99.9%", label: "Uptime SLA", icon: <Shield className="w-6 h-6" /> },
-    { number: "10,000+", label: "Happy Customers", icon: <Heart className="w-6 h-6" /> }
-  ];
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data: aboutContent, isLoading, error, refetch } = useAboutPageContent();
 
-  const values = [
-    {
-      icon: <Lightbulb className="w-8 h-8 text-primary" />,
-      title: "Innovation First",
-      description: "We constantly push the boundaries of what's possible in content management and delivery."
-    },
-    {
-      icon: <Users className="w-8 h-8 text-accent" />,
-      title: "Customer Obsessed",
-      description: "Every decision we make is driven by delivering exceptional value to our customers."
-    },
-    {
-      icon: <Rocket className="w-8 h-8 text-primary" />,
-      title: "Speed & Performance",
-      description: "We believe fast, reliable experiences are essential for modern digital success."
-    },
-    {
-      icon: <Heart className="w-8 h-8 text-accent" />,
-      title: "Inclusive & Diverse",
-      description: "We build products and foster a culture that welcomes everyone, everywhere."
+  // Debug logging
+  React.useEffect(() => {
+    console.log('=== ABOUT PAGE DEBUG ===');
+    console.log('isLoading:', isLoading);
+    console.log('error:', error);
+    console.log('aboutContent:', aboutContent);
+    console.log('team_members length:', aboutContent?.team_members?.length || 0);
+  }, [aboutContent, isLoading, error]);
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['contentstack', 'about'] });
+    refetch();
+  };
+
+  const handleViewPositions = () => {
+    navigate('/career');
+  };
+
+  // Icon mapping for values
+  const iconMap: { [key: string]: any } = {
+    innovation: Zap,
+    reliability: Shield,
+    simplicity: Heart,
+    community: Users,
+    default: Heart
+  };
+
+  // Separate leaders from team members based on position or check if they have leader data
+  const allMembers = aboutContent?.team_members || [];
+  
+  // Ensure photos are always available - normalize photo URLs
+  const normalizedMembers = allMembers.length > 0 ? allMembers.map((member: any) => {
+    let photoUrl = '';
+    if (member.photo) {
+      if (typeof member.photo === 'string') {
+        photoUrl = member.photo;
+      } else if (member.photo.url) {
+        photoUrl = member.photo.url;
+      } else {
+        photoUrl = member.photo;
+      }
     }
-  ];
-
-  const team = [
+    return {
+      ...member,
+      photo: photoUrl || (member.name?.includes('Sarah') ? 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=faces&auto=format&q=80' : 
+                            member.name?.includes('Emily') ? 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=faces&auto=format&q=80' :
+                            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80')
+    };
+  }) : [
+    // Default fallback leaders
     {
-      name: "Alex Chen",
-      role: "CEO & Co-Founder",
-      bio: "Former VP of Engineering at major tech companies. Passionate about democratizing content creation.",
-      image: "AC"
+      name: "Sarah Johnson",
+      position: "CEO & Co-founder",
+      bio: "Former VP of Engineering at TechCorp, leading our vision for the future of content management with 15+ years of experience in scaling technology companies.",
+      photo: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=faces&auto=format&q=80"
     },
     {
-      name: "Sarah Martinez",
-      role: "CTO & Co-Founder",
-      bio: "20+ years in distributed systems. Led engineering teams at scale-up and Fortune 500 companies.",
-      image: "SM"
+      name: "Michael Chen",
+      position: "CTO & Co-founder",
+      bio: "Architect of our scalable platform infrastructure with 15+ years in distributed systems and a passion for building technology that scales globally.",
+      photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80"
+    },
+    // Default fallback team members
+    {
+      name: "Emily Rodriguez",
+      position: "Head of Engineering",
+      bio: "Product strategist focused on creating intuitive user experiences that delight our customers.",
+      photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=faces&auto=format&q=80"
     },
     {
       name: "David Kim",
-      role: "Head of Product",
-      bio: "Product leader with expertise in developer tools and enterprise software. Former PM at leading SaaS companies.",
-      image: "DK"
+      position: "Lead Engineer",
+      bio: "Full-stack developer passionate about building scalable systems and mentoring the next generation of engineers.",
+      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80"
     },
     {
-      name: "Maria Rodriguez",
-      role: "VP of Engineering",
-      bio: "Full-stack engineer turned engineering leader. Expert in cloud infrastructure and API design.",
-      image: "MR"
+      name: "Lisa Wang",
+      position: "Head of Design",
+      bio: "Creative director who believes great design is invisible and focuses on user-centered design principles.",
+      photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=faces&auto=format&q=80"
+    },
+    {
+      name: "James Wilson",
+      position: "Head of Marketing",
+      bio: "Growth expert who loves telling stories and building communities around innovative technology solutions.",
+      photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80"
     }
   ];
+  
+  // Separate into CEO, CTO, and Team Members
+  const ceo = normalizedMembers.find((member: any) => {
+    const pos = member.position?.toLowerCase() || '';
+    return pos.includes('ceo') || (pos.includes('founder') && pos.includes('ceo'));
+  });
+  
+  const cto = normalizedMembers.find((member: any) => {
+    const pos = member.position?.toLowerCase() || '';
+    return pos.includes('cto') || (pos.includes('founder') && pos.includes('cto'));
+  });
+  
+  // Get team members (exclude CEO and CTO)
+  const teamMembers = normalizedMembers.filter((member: any) => {
+    const pos = member.position?.toLowerCase() || '';
+    return !pos.includes('ceo') && !pos.includes('co-founder') && !pos.includes('cto') && !pos.includes('founder');
+  }).slice(0, 4);
+  
+  console.log('CEO:', ceo);
+  console.log('CTO:', cto);
+  console.log('Team members:', teamMembers);
+
+  // Default values if no data
+  const heroTitle = aboutContent?.title || "Building the future of content management";
+  const heroDescription = aboutContent?.subtitle || aboutContent?.description || "We're on a mission to revolutionize how companies create, manage, and deliver digital experiences that captivate and convert.";
+  const mission = aboutContent?.mission_statement || "To empower teams with intelligent content management tools that adapt to their needs and scale with their growth.";
+  const vision = aboutContent?.vision_statement || "A world where every digital experience is perfectly tailored to its audience, powered by intelligent content management.";
+  const values = aboutContent?.values || [];
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-pulse"></div>
-          <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
-        </div>
-        <div className="container mx-auto max-w-5xl text-center relative z-10">
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 animate-fade-in">
-            About <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">FlowStack</span>
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 animate-fade-in max-w-3xl mx-auto leading-relaxed">
-            We're on a mission to empower teams worldwide to create exceptional digital experiences that drive business growth and delight customers.
-          </p>
-        </div>
-      </section>
+      <section className="relative pt-32 pb-20 px-6">
+        <div className="container max-w-6xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 backdrop-blur-sm">
+              <Sparkles className="w-5 h-5 text-purple-400 mr-2" />
+              <span className="text-sm font-medium text-purple-400">About The Content</span>
+            </div>
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              size="sm"
+              className="border-purple-500/30 hover:bg-purple-500/10"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
 
-      {/* Stats Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <Card key={index} className="text-center bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex justify-center mb-4">
-                    <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10">
-                      {stat.icon}
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
-                    {stat.number}
-                  </div>
-                  <div className="text-muted-foreground font-medium">{stat.label}</div>
-                </CardContent>
-              </Card>
-            ))}
+          {/* Debug Info */}
+          <div className="mb-8 p-4 bg-gray-900/50 border border-gray-700 rounded-lg text-left max-w-4xl mx-auto">
+            <h3 className="text-lg font-semibold text-white mb-4">🔍 Debug Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
+                <p><strong>Error:</strong> {error ? 'Yes' : 'No'}</p>
+                <p><strong>Data:</strong> {aboutContent ? 'Yes' : 'No'}</p>
+                <p><strong>Team Members:</strong> {aboutContent?.team_members?.length || 0}</p>
+              </div>
+              <div>
+                <p><strong>Title:</strong> {aboutContent?.title || 'Not loaded'}</p>
+                <p><strong>Mission:</strong> {aboutContent?.mission_statement ? 'Yes' : 'No'}</p>
+                <p><strong>Vision:</strong> {aboutContent?.vision_statement ? 'Yes' : 'No'}</p>
+                <p><strong>Values:</strong> {aboutContent?.values?.length || 0}</p>
+              </div>
+            </div>
+            {error && (
+              <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded">
+                <p className="text-red-400 font-semibold">Error Details:</p>
+                <p className="text-red-300 text-xs mt-1">{error.message || JSON.stringify(error)}</p>
+              </div>
+            )}
+            <div className="mt-4 text-xs text-gray-400">
+              <p><strong>Check browser console (F12) for detailed logs</strong></p>
+            </div>
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight mt-12">
+            {heroTitle.split(' ').map((word, i) => 
+              word.toLowerCase() === 'content' ? (
+                <span key={i} className="bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                  {word}{' '}
+                </span>
+              ) : (
+                <span key={i}>{word}{' '}</span>
+              )
+            )}
+          </h1>
+
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto mb-12 leading-relaxed font-light">
+            {heroDescription}
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <Button size="lg" className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white text-lg px-10 py-7 shadow-xl shadow-purple-500/20 group transition-all duration-300 hover:scale-105">
+              Join Our Mission
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+            <Button size="lg" variant="outline" className="text-foreground hover:text-primary font-medium px-10 py-7 text-lg transition-all duration-300 hover:scale-105 border-2">
+              Our Story
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section className="py-24 bg-muted/30">
-        <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* Mission & Vision */}
+      {mission && vision && (
+        <section className="py-20 px-6 bg-gradient-to-r from-purple-500/5 via-blue-500/5 to-cyan-500/5">
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-                  Our Mission
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+                  Our <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Mission</span>
                 </h2>
-                <p className="text-muted-foreground text-lg mb-6 leading-relaxed">
-                  Founded in 2019, FlowStack emerged from a simple observation: content creation and management 
-                  was becoming increasingly complex, while user expectations for digital experiences were soaring.
+                <p className="text-xl text-muted-foreground leading-relaxed mb-8">
+                  {mission}
                 </p>
-                <p className="text-muted-foreground text-lg mb-6 leading-relaxed">
-                  We set out to build a platform that would make it easy for teams of any size to create, 
-                  manage, and deliver content that truly engages their audience—without the technical complexity 
-                  that traditionally came with such capabilities.
-                </p>
-                <Button className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 group">
-                  Learn More About Our Story
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <span className="text-lg font-medium text-foreground">Passionate about innovation</span>
+                </div>
               </div>
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-3xl"></div>
-                <Card className="relative bg-card/80 backdrop-blur-sm">
-                  <CardContent className="p-8">
-                    <Target className="w-12 h-12 text-primary mb-4" />
-                    <h3 className="text-xl font-semibold text-foreground mb-3">
-                      Vision for Tomorrow
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      A world where every organization can deliver personalized, 
-                      contextual experiences that adapt in real-time to user needs and preferences.
-                    </p>
-                  </CardContent>
-                </Card>
+              <div>
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+                  Our <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Vision</span>
+                </h2>
+                <p className="text-xl text-muted-foreground leading-relaxed mb-8">
+                  {vision}
+                </p>
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-blue-400" />
+              </div>
+                  <span className="text-lg font-medium text-foreground">Global impact through technology</span>
               </div>
             </div>
           </div>
         </div>
       </section>
+      )}
 
-      {/* Values Section */}
-      <section className="py-24">
-        <div className="container mx-auto px-6">
+      {/* Values */}
+      {values.length > 0 && (
+        <section className="py-20 px-6">
+          <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Our Core Values
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+                Our <span className="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">Values</span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              These principles guide everything we do, from product development to customer relationships.
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                The principles that guide everything we do
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {values.map((value, index) => (
-              <Card key={index} className="group hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 hover:-translate-y-1 bg-card/50 backdrop-blur-sm border-border/50">
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-colors">
-                      {value.icon}
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {values.map((value, index) => {
+                const IconComponent = iconMap[value.value_title.toLowerCase()] || iconMap.default;
+                return (
+                  <Card key={index} className="p-8 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border border-green-500/20 hover:border-green-500/40 transition-all duration-300 hover:scale-105 group">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500/20 to-blue-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                      <IconComponent className="w-7 h-7 text-green-400" />
                     </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                        {value.title}
-                      </h3>
-                      <p className="text-muted-foreground leading-relaxed">
-                        {value.description}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
+                    <h3 className="text-2xl font-bold text-white mb-4">{value.value_title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{value.value_description}</p>
               </Card>
-            ))}
+                );
+              })}
           </div>
         </div>
       </section>
+      )}
 
-      {/* Team Section */}
-      <section className="py-24 bg-muted/30">
-        <div className="container mx-auto px-6">
+      {/* Leadership Team - Flowchart Style */}
+      {(ceo || cto || teamMembers.length > 0) && (
+        <section className="py-20 px-6 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-cyan-500/5">
+          <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Meet Our Leadership Team
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+                Meet Our <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Team</span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Experienced leaders who are passionate about building technology that makes a difference.
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                The visionaries leading our mission to transform content management
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
-              <Card key={index} className="text-center bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
-                <CardContent className="p-6">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
-                    {member.image}
+            {/* Flowchart Structure */}
+            <div className="flex flex-col items-center space-y-8">
+              {/* CEO at top */}
+              {ceo && (
+                <div className="flex flex-col items-center">
+                  <Card className="p-8 bg-gradient-to-br from-card/90 to-card/50 backdrop-blur-md border-2 border-blue-500/40 hover:border-blue-500/60 transition-all duration-300 hover:scale-105 shadow-xl shadow-blue-500/20 w-72">
+                    <div className="text-center">
+                      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500/30 to-purple-500/30 flex items-center justify-center mx-auto mb-6 overflow-hidden border-4 border-blue-500/50 shadow-lg">
+                        <img 
+                          src={typeof ceo.photo === 'string' ? ceo.photo : (ceo.photo?.url || 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=faces&auto=format&q=80')}
+                          alt={ceo.name || 'CEO'}
+                          className="w-28 h-28 rounded-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=faces&auto=format&q=80';
+                          }}
+                        />
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-2">{ceo.name || 'CEO'}</h3>
+                      <p className="text-lg text-blue-400 mb-4 font-medium">{ceo.position || 'CEO'}</p>
+                      <p className="text-muted-foreground leading-relaxed text-sm">{ceo.bio || 'Bio coming soon'}</p>
+                    </div>
+                  </Card>
+                  
+                  {/* Connection line down to CTO */}
+                  {cto && (
+                    <div className="w-0.5 h-16 bg-gradient-to-b from-blue-500 via-purple-500 to-cyan-500 mt-8"></div>
+                  )}
+                </div>
+              )}
+
+              {/* CTO below CEO */}
+              {cto && (
+                <div className="flex flex-col items-center">
+                  <Card className="p-6 bg-gradient-to-br from-card/90 to-card/50 backdrop-blur-md border-2 border-purple-500/40 hover:border-purple-500/60 transition-all duration-300 hover:scale-105 shadow-xl shadow-purple-500/20 w-64">
+                    <div className="text-center">
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500/30 to-pink-500/30 flex items-center justify-center mx-auto mb-4 overflow-hidden border-4 border-purple-500/50 shadow-lg">
+                        <img 
+                          src={typeof cto.photo === 'string' ? cto.photo : (cto.photo?.url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80')}
+                          alt={cto.name || 'CTO'}
+                          className="w-20 h-20 rounded-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80';
+                          }}
+                        />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-1">{cto.name || 'CTO'}</h3>
+                      <p className="text-base text-purple-400 mb-2 font-medium">{cto.position || 'CTO'}</p>
+                      <p className="text-muted-foreground leading-relaxed text-xs">{cto.bio || 'Bio coming soon'}</p>
+                    </div>
+                  </Card>
+                  
+                  {/* Connection line down to Team Members */}
+                  {teamMembers.length > 0 && (
+                    <div className="w-0.5 h-16 bg-gradient-to-b from-purple-500 via-green-500 to-cyan-500 mt-8"></div>
+                  )}
+                </div>
+              )}
+
+              {/* Team Members T1-T4 below CTO at same level */}
+              {teamMembers.length > 0 && (
+                <div className="flex flex-col items-center w-full">
+                  {/* Horizontal connecting line */}
+                  <div className="relative w-full max-w-5xl mb-8 flex justify-center">
+                    <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-green-500/50 to-transparent"></div>
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-1">
-                    {member.name}
-                  </h3>
-                  <div className="text-primary font-medium mb-3">
-                    {member.role}
+                  
+                  {/* Team Members row */}
+                  <div className="flex flex-wrap items-start justify-center gap-6 md:gap-8 w-full max-w-6xl">
+                    {teamMembers.map((member, index) => {
+                      const photoUrl = typeof member.photo === 'string' ? member.photo : (member.photo?.url || '');
+                      const fallbackImages = [
+                        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=faces&auto=format&q=80',
+                        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80',
+                        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=faces&auto=format&q=80',
+                        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80'
+                      ];
+                      return (
+                        <div key={index} className="flex flex-col items-center">
+                          <Card className="p-5 bg-gradient-to-br from-card/90 to-card/50 backdrop-blur-md border-2 border-green-500/40 hover:border-green-500/60 transition-all duration-300 hover:scale-105 shadow-xl shadow-green-500/20 w-56">
+                            <div className="text-center">
+                              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500/30 to-blue-500/30 flex items-center justify-center mx-auto mb-3 overflow-hidden border-2 border-green-500/50 shadow-lg">
+                                <img 
+                                  src={photoUrl || fallbackImages[index % fallbackImages.length]}
+                                  alt={member.name || `T${index + 1}`}
+                                  className="w-18 h-18 rounded-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = fallbackImages[index % fallbackImages.length];
+                                  }}
+                                />
+                              </div>
+                              <h3 className="text-lg font-bold text-white mb-1">{member.name || `T${index + 1}`}</h3>
+                              <p className="text-sm text-green-400 mb-2 font-medium">{member.position || 'Team Member'}</p>
+                              <p className="text-muted-foreground leading-relaxed text-xs line-clamp-2">{member.bio || 'Bio'}</p>
+                            </div>
+                          </Card>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {member.bio}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+              )}
           </div>
         </div>
       </section>
+      )}
 
-      {/* CTA Section */}
-      <section className="py-24">
-        <div className="container mx-auto px-6">
-          <Card className="max-w-4xl mx-auto bg-card/80 backdrop-blur-sm border-2 border-border/50 shadow-xl">
-            <CardContent className="p-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Ready to join our journey?
+
+      {/* CTA */}
+      <section className="py-32 px-6">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center">
+            <h2 className="text-5xl md:text-7xl font-bold mb-8 text-foreground tracking-tight">
+              Ready to Join Our
+              <span className="block bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                Mission?
+              </span>
               </h2>
-              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Whether you're looking to build amazing experiences or join our team, 
-                we'd love to hear from you.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 group">
-                  Start Building Today
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                <Button size="lg" variant="outline">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-16 font-light leading-relaxed">
+              Be part of a team that's shaping the future of content management
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+              <Button 
+                size="lg" 
+                onClick={handleViewPositions}
+                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-medium px-12 py-4 rounded-full text-lg transition-all duration-300 hover:scale-105"
+              >
                   View Open Positions
                 </Button>
+              <Button size="lg" variant="ghost" className="text-foreground hover:text-primary font-medium px-12 py-4 text-lg transition-all duration-300">
+                Learn More
+              </Button>
+            </div>
               </div>
-            </CardContent>
-          </Card>
         </div>
       </section>
     </div>

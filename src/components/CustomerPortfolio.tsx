@@ -17,7 +17,7 @@ export function CustomerPortfolio() {
             Trusted by Industry Leaders
           </h2>
           <p className="text-muted-foreground text-lg">
-            Over 10,000 companies worldwide rely on FlowStack
+            Over 10,000 companies worldwide rely on The Content
           </p>
         </div>
 

@@ -1,0 +1,18 @@
+{
+  "entry": {
+    "hero_title": "Building the future of content management",
+    "hero_description": "We're on a mission to revolutionize how companies create, manage, and deliver digital experiences that captivate and convert.",
+    "mission_statement": "To empower teams with intelligent content management tools that adapt to their needs and scale with their growth, enabling them to create exceptional digital experiences.",
+    "vision_statement": "A world where every digital experience is perfectly tailored to its audience, powered by intelligent content management that understands context and delivers value.",
+    "value_title": "Innovation",
+    "value_description": "We constantly push the boundaries of what's possible in content management.",
+    "leader_name": "Sarah Johnson",
+    "leader_position": "CEO & Co-founder",
+    "leader_bio": "Former VP of Engineering at TechCorp, leading our vision for the future of content management with 15+ years of experience in scaling technology companies.",
+    "leader_photo": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face&auto=format&q=80",
+    "team_member_name": "Emily Rodriguez",
+    "team_member_position": "Head of Product",
+    "team_member_bio": "Product strategist focused on creating intuitive user experiences that delight our customers.",
+    "team_member_photo": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face&auto=format&q=80"
+  }
+}

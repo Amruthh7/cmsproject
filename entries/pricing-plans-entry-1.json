@@ -1,0 +1,12 @@
+{
+  "entry": {
+    "section_title": "Choose Your Plan",
+    "section_description": "Start free and scale as you grow. All plans include our core features.",
+    "plan_name": "Starter",
+    "price": "Free",
+    "period": "forever",
+    "plan_description": "Perfect for small teams and personal projects",
+    "feature": "Up to 5 users",
+    "is_popular": false
+  }
+}

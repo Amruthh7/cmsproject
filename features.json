@@ -1,0 +1,147 @@
+{
+  "created_at": "2025-01-15T00:00:00.000Z",
+  "updated_at": "2025-01-15T00:00:00.000Z",
+  "title": "Features",
+  "uid": "features",
+  "_version": 1,
+  "inbuilt_class": false,
+  "schema": [
+    {
+      "data_type": "text",
+      "display_name": "Title",
+      "field_metadata": {
+        "_default": true,
+        "version": 1,
+        "description": "Section title"
+      },
+      "mandatory": true,
+      "uid": "title",
+      "unique": true,
+      "multiple": false,
+      "non_localizable": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Description",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Section description",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "description",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Feature Title",
+      "field_metadata": {
+        "description": "Name of the feature",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "feature_title",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Feature Description",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Detailed description of the feature",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "feature_description",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Feature Icon",
+      "field_metadata": {
+        "description": "Icon name (e.g., Zap, Globe, Shield)",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "feature_icon",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "file",
+      "display_name": "Feature Image",
+      "field_metadata": {
+        "description": "Feature image URL or file",
+        "rich_text_type": "standard",
+        "image": true
+      },
+      "mandatory": false,
+      "uid": "feature_image",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false,
+      "dimension": {
+        "width": {
+          "min": null,
+          "max": null
+        },
+        "height": {
+          "min": null,
+          "max": null
+        }
+      }
+    }
+  ],
+  "last_activity": {},
+  "maintain_revisions": true,
+  "description": "Features section with list of platform features",
+  "DEFAULT_ACL": [
+    {
+      "k": "others",
+      "v": {
+        "read": false,
+        "create": false
+      }
+    }
+  ],
+  "SYS_ACL": {
+    "roles": []
+  },
+  "options": {
+    "is_page": false,
+    "singleton": true,
+    "sub_title": [],
+    "title": "title"
+  },
+  "abilities": {
+    "get_one_object": true,
+    "get_all_objects": true,
+    "create_object": true,
+    "update_object": true,
+    "delete_object": true,
+    "delete_all_objects": true
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "created_at": "2025-01-15T00:00:00.000Z",
+  "updated_at": "2025-01-15T00:00:00.000Z",
+  "title": "Pricing Plans",
+  "uid": "pricing_plans",
+  "_version": 1,
+  "inbuilt_class": false,
+  "schema": [
+    {
+      "data_type": "text",
+      "display_name": "Section Title",
+      "field_metadata": {
+        "_default": true,
+        "version": 1,
+        "description": "Pricing section title"
+      },
+      "mandatory": true,
+      "uid": "section_title",
+      "unique": true,
+      "multiple": false,
+      "non_localizable": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Section Description",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Pricing section description",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "section_description",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Plan Name",
+      "field_metadata": {
+        "description": "Name of the pricing plan",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "plan_name",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Price",
+      "field_metadata": {
+        "description": "Plan price",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "price",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Period",
+      "field_metadata": {
+        "description": "Billing period (e.g., per month, per year)",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "period",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Plan Description",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Plan description",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "plan_description",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Feature",
+      "field_metadata": {
+        "description": "Feature name",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "feature",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "boolean",
+      "display_name": "Is Popular",
+      "field_metadata": {
+        "description": "Mark this plan as popular",
+        "default_value": false
+      },
+      "mandatory": false,
+      "uid": "is_popular",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    }
+  ],
+  "last_activity": {},
+  "maintain_revisions": true,
+  "description": "Pricing plans with features and descriptions",
+  "DEFAULT_ACL": [
+    {
+      "k": "others",
+      "v": {
+        "read": false,
+        "create": false
+      }
+    }
+  ],
+  "SYS_ACL": {
+    "roles": []
+  },
+  "options": {
+    "is_page": false,
+    "singleton": true,
+    "sub_title": [],
+    "title": "section_title"
+  },
+  "abilities": {
+    "get_one_object": true,
+    "get_all_objects": true,
+    "create_object": true,
+    "update_object": true,
+    "delete_object": true,
+    "delete_all_objects": true
+  }
+}

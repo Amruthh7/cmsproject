@@ -2,12 +2,32 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CheckCircle, X, Zap, Crown, Rocket, Sparkles } from "lucide-react";
+import { usePricingPlansContent } from "@/hooks/useContentstack";
 
 const Pricing = () => {
-  const plans = [
+  const { data: pricingContent, isLoading } = usePricingPlansContent();
+
+  const iconMap: { [key: string]: any } = {
+    starter: Zap,
+    professional: Crown,
+    enterprise: Rocket,
+    default: Zap
+  };
+
+  const plans = pricingContent?.plans?.map((plan) => ({
+    name: plan.plan_name,
+    icon: iconMap[plan.plan_name.toLowerCase()] || iconMap.default,
+    price: plan.price,
+    period: plan.period,
+    description: plan.description,
+    features: plan.features?.map(f => f.feature) || [],
+    limitations: [],
+    popular: plan.is_popular || false,
+    cta: plan.is_popular ? "Start Free Trial" : plan.plan_name === "Enterprise" ? "Contact Sales" : "Get Started Free"
+  })) || [
     {
       name: "Starter",
-      icon: <Zap className="w-6 h-6" />,
+      icon: Zap,
       price: "Free",
       period: "forever",
       description: "Perfect for small projects and personal use",
@@ -20,7 +40,7 @@ const Pricing = () => {
       ],
       limitations: [
         "No custom domains",
-        "FlowStack branding",
+        "The Content branding",
         "Limited API calls"
       ],
       popular: false,
@@ -28,7 +48,7 @@ const Pricing = () => {
     },
     {
       name: "Professional",
-      icon: <Crown className="w-6 h-6" />,
+      icon: Crown,
       price: "$29",
       period: "per month",
       description: "Ideal for growing businesses and teams",
@@ -49,7 +69,7 @@ const Pricing = () => {
     },
     {
       name: "Enterprise",
-      icon: <Rocket className="w-6 h-6" />,
+      icon: Rocket,
       price: "Custom",
       period: "pricing",
       description: "For large organizations with specific needs",
@@ -100,10 +120,15 @@ const Pricing = () => {
         </div>
         <div className="container mx-auto max-w-5xl text-center relative z-10">
           <h1 className="text-6xl md:text-7xl font-bold mb-6 animate-fade-in">
-            Simple, <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Transparent</span> Pricing
+            {pricingContent?.title || "Simple, Transparent Pricing"}
+            {pricingContent?.title && (
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                {' '}Transparent
+              </span>
+            )}
           </h1>
           <p className="text-xl text-muted-foreground mb-8 animate-fade-in max-w-2xl mx-auto">
-            Choose the perfect plan for your team. Scale as you grow with flexible, usage-based pricing.
+            {pricingContent?.description || "Choose the perfect plan for your team. Scale as you grow with flexible, usage-based pricing."}
           </p>
         </div>
       </section>
@@ -112,7 +137,9 @@ const Pricing = () => {
       <section className="py-12">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {plans.map((plan, index) => (
+            {plans.map((plan, index) => {
+              const IconComponent = typeof plan.icon === 'function' ? plan.icon : Zap;
+              return (
             <Card 
               key={index}
               className={`p-8 relative ${
@@ -132,7 +159,7 @@ const Pricing = () => {
                 <CardHeader className={`text-center ${plan.popular ? 'pt-12' : 'pt-6'}`}>
                   <div className="flex items-center justify-center space-x-2 mb-4">
                     <div className="p-2 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10">
-                      {plan.icon}
+                      <IconComponent className="w-6 h-6" />
                     </div>
                     <h3 className="text-2xl font-bold text-foreground">{plan.name}</h3>
                   </div>
@@ -180,7 +207,8 @@ const Pricing = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

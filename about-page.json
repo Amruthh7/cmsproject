@@ -1,0 +1,293 @@
+{
+  "created_at": "2025-01-15T00:00:00.000Z",
+  "updated_at": "2025-01-15T00:00:00.000Z",
+  "title": "About Page",
+  "uid": "about_page",
+  "_version": 1,
+  "inbuilt_class": false,
+  "schema": [
+    {
+      "data_type": "text",
+      "display_name": "Hero Title",
+      "field_metadata": {
+        "_default": true,
+        "version": 1,
+        "description": "Main title for about page"
+      },
+      "mandatory": true,
+      "uid": "hero_title",
+      "unique": true,
+      "multiple": false,
+      "non_localizable": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Hero Description",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Hero section description",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "hero_description",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Mission Statement",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Company mission statement",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "mission_statement",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Vision Statement",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Company vision statement",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "vision_statement",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Value Title",
+      "field_metadata": {
+        "description": "Name of the value",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "value_title",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Value Description",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Description of the value",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "value_description",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Leader Name",
+      "field_metadata": {
+        "description": "Leader's full name",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "leader_name",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Leader Position",
+      "field_metadata": {
+        "description": "Job title/position",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "leader_position",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Leader Bio",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Biography text",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "leader_bio",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "file",
+      "display_name": "Leader Photo",
+      "field_metadata": {
+        "description": "Leader's profile photo",
+        "rich_text_type": "standard",
+        "image": true
+      },
+      "mandatory": false,
+      "uid": "leader_photo",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false,
+      "dimension": {
+        "width": {
+          "min": null,
+          "max": null
+        },
+        "height": {
+          "min": null,
+          "max": null
+        }
+      }
+    },
+    {
+      "data_type": "text",
+      "display_name": "Team Member Name",
+      "field_metadata": {
+        "description": "Team member's full name",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "team_member_name",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Team Member Position",
+      "field_metadata": {
+        "description": "Job title/position",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "team_member_position",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Team Member Bio",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Short biography",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "team_member_bio",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "file",
+      "display_name": "Team Member Photo",
+      "field_metadata": {
+        "description": "Team member's profile photo",
+        "rich_text_type": "standard",
+        "image": true
+      },
+      "mandatory": false,
+      "uid": "team_member_photo",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false,
+      "dimension": {
+        "width": {
+          "min": null,
+          "max": null
+        },
+        "height": {
+          "min": null,
+          "max": null
+        }
+      }
+    }
+  ],
+  "last_activity": {},
+  "maintain_revisions": true,
+  "description": "About page content including mission, vision, values, leadership and team",
+  "DEFAULT_ACL": [
+    {
+      "k": "others",
+      "v": {
+        "read": false,
+        "create": false
+      }
+    }
+  ],
+  "SYS_ACL": {
+    "roles": []
+  },
+  "options": {
+    "is_page": false,
+    "singleton": true,
+    "sub_title": [],
+    "title": "hero_title"
+  },
+  "abilities": {
+    "get_one_object": true,
+    "get_all_objects": true,
+    "create_object": true,
+    "update_object": true,
+    "delete_object": true,
+    "delete_all_objects": true
+  }
+}

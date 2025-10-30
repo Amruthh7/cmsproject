@@ -1,0 +1,18 @@
+{
+  "entry": {
+    "hero_title": "Join Our Mission",
+    "hero_description": "Build the future of content management with a team that's passionate about innovation, collaboration, and making a real impact.",
+    "company_history_year": "2020",
+    "company_history_title": "The Beginning",
+    "company_history_description": "Founded with a vision to revolutionize content management",
+    "job_title": "Senior Frontend Developer",
+    "job_location": "San Francisco, CA",
+    "job_type": "Full-time",
+    "job_department": "Engineering",
+    "job_description": "Build amazing user experiences with React, TypeScript, and modern web technologies.",
+    "benefit_title": "Health & Wellness",
+    "benefit_description": "Comprehensive health, dental, and vision coverage",
+    "company_stat_value": "150+",
+    "company_stat_label": "Team Members"
+  }
+}

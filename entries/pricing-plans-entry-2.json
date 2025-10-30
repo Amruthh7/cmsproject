@@ -1,0 +1,12 @@
+{
+  "entry": {
+    "section_title": "Choose Your Plan",
+    "section_description": "Start free and scale as you grow. All plans include our core features.",
+    "plan_name": "Professional",
+    "price": "$99",
+    "period": "per month",
+    "plan_description": "Ideal for growing businesses and teams",
+    "feature": "Up to 25 users",
+    "is_popular": true
+  }
+}

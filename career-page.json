@@ -1,0 +1,283 @@
+{
+  "created_at": "2025-01-15T00:00:00.000Z",
+  "updated_at": "2025-01-15T00:00:00.000Z",
+  "title": "Career Page",
+  "uid": "career_page",
+  "_version": 1,
+  "inbuilt_class": false,
+  "schema": [
+    {
+      "data_type": "text",
+      "display_name": "Hero Title",
+      "field_metadata": {
+        "_default": true,
+        "version": 1,
+        "description": "Main title for career page"
+      },
+      "mandatory": true,
+      "uid": "hero_title",
+      "unique": true,
+      "multiple": false,
+      "non_localizable": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Hero Description",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Hero section description",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "hero_description",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Company History Year",
+      "field_metadata": {
+        "description": "Year of the milestone",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "company_history_year",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Company History Title",
+      "field_metadata": {
+        "description": "Milestone title",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "company_history_title",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Company History Description",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Milestone description",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "company_history_description",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Job Title",
+      "field_metadata": {
+        "description": "Job title",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "job_title",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Job Location",
+      "field_metadata": {
+        "description": "Job location",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "job_location",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Job Type",
+      "field_metadata": {
+        "description": "Employment type (e.g., Full-time, Part-time)",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "job_type",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Job Department",
+      "field_metadata": {
+        "description": "Department name",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "job_department",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Job Description",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Job description",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "job_description",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Benefit Title",
+      "field_metadata": {
+        "description": "Benefit title",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "benefit_title",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Benefit Description",
+      "field_metadata": {
+        "allow_rich_text": true,
+        "description": "Benefit description",
+        "multiline": false,
+        "rich_text_type": "advanced",
+        "options": [],
+        "version": 1
+      },
+      "mandatory": true,
+      "uid": "benefit_description",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Company Stat Value",
+      "field_metadata": {
+        "description": "Statistic value",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "company_stat_value",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    },
+    {
+      "data_type": "text",
+      "display_name": "Company Stat Label",
+      "field_metadata": {
+        "description": "Statistic label",
+        "default_value": "",
+        "version": 1
+      },
+      "format": "",
+      "error_messages": {
+        "format": ""
+      },
+      "mandatory": true,
+      "uid": "company_stat_label",
+      "multiple": false,
+      "non_localizable": false,
+      "unique": false
+    }
+  ],
+  "last_activity": {},
+  "maintain_revisions": true,
+  "description": "Career page content including company history, open positions, benefits and stats",
+  "DEFAULT_ACL": [
+    {
+      "k": "others",
+      "v": {
+        "read": false,
+        "create": false
+      }
+    }
+  ],
+  "SYS_ACL": {
+    "roles": []
+  },
+  "options": {
+    "is_page": false,
+    "singleton": true,
+    "sub_title": [],
+    "title": "hero_title"
+  },
+  "abilities": {
+    "get_one_object": true,
+    "get_all_objects": true,
+    "create_object": true,
+    "update_object": true,
+    "delete_object": true,
+    "delete_all_objects": true
+  }
+}
