@@ -2,7 +2,7 @@ import Contentstack from 'contentstack';
 
 // Contentstack configuration
 const apiKey = import.meta.env.VITE_CONTENTSTACK_API_KEY || 'blt755dc6238a6bbc27';
-const deliveryToken = import.meta.env.VITE_CONTENTSTACK_DELIVERY_TOKEN || 'cs05eb74f9e80cece6d90fd6e3';
+const deliveryToken = import.meta.env.VITE_CONTENTSTACK_DELIVERY_TOKEN || 'cs883055338ecc94378e773555';
 // Note: Use branch name as environment (cmsproject was mentioned as the branch name)
 const environment = import.meta.env.VITE_CONTENTSTACK_ENVIRONMENT || 'cmsproject';
 const region = import.meta.env.VITE_CONTENTSTACK_REGION || 'us';
