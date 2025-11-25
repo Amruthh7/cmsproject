@@ -6,6 +6,7 @@ const deliveryToken = import.meta.env.VITE_CONTENTSTACK_DELIVERY_TOKEN || 'cs883
 // Note: Use branch name as environment (cmsproject was mentioned as the branch name)
 const environment = import.meta.env.VITE_CONTENTSTACK_ENVIRONMENT || 'cmsproject';
 const region = import.meta.env.VITE_CONTENTSTACK_REGION || 'us';
+const branch = import.meta.env.VITE_CONTENTSTACK_BRANCH || 'cmsproject';
 
 // Debug: Show current configuration
 console.log('🔧 Current Contentstack Configuration:');
@@ -26,6 +27,7 @@ if (import.meta.env.DEV) {
   console.log('  Delivery Token:', deliveryToken.substring(0, 10) + '...');
   console.log('  Environment:', environment);
   console.log('  Region:', region);
+  console.log('  Branch:', branch);
 }
 
 const Stack = Contentstack.Stack({
@@ -33,6 +35,8 @@ const Stack = Contentstack.Stack({
   delivery_token: deliveryToken,
   environment: environment,
   region: region,
+  branch: branch,
 });
 
 export default Stack;
+export const contentstackConfig = { apiKey, deliveryToken, environment, region, branch };

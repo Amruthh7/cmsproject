@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useCareerPageContent } from "@/hooks/useContentstack";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Animated Counter Component
 const AnimatedCounter = ({ end, duration = 2000, suffix = "" }: { end: number; duration?: number; suffix?: string }) => {
@@ -52,7 +53,14 @@ const AnimatedCounter = ({ end, duration = 2000, suffix = "" }: { end: number; d
 };
 
 const Career = () => {
-  const { data: careerContent, isLoading } = useCareerPageContent();
+  const queryClient = useQueryClient();
+  const { data: careerContent, isLoading, error, refetch } = useCareerPageContent();
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['contentstack', 'career'] });
+    refetch();
+  };
+
 
   // Icon mapping for company history
   const historyIcons = [Rocket, Zap, Globe, Shield, Layers];

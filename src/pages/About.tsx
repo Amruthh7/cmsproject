@@ -10,16 +10,11 @@ import { useQueryClient } from "@tanstack/react-query";
 const About = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data: aboutContent, isLoading, error, refetch } = useAboutPageContent();
+  const { data: aboutData, isLoading, error, refetch } = useAboutPageContent();
+  
+  // Type assertion to handle the data structure
+  const aboutContent = aboutData as any;
 
-  // Debug logging
-  React.useEffect(() => {
-    console.log('=== ABOUT PAGE DEBUG ===');
-    console.log('isLoading:', isLoading);
-    console.log('error:', error);
-    console.log('aboutContent:', aboutContent);
-    console.log('team_members length:', aboutContent?.team_members?.length || 0);
-  }, [aboutContent, isLoading, error]);
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ['contentstack', 'about'] });
@@ -101,26 +96,58 @@ const About = () => {
     }
   ];
   
-  // Separate into CEO, CTO, and Team Members
-  const ceo = normalizedMembers.find((member: any) => {
-    const pos = member.position?.toLowerCase() || '';
-    return pos.includes('ceo') || (pos.includes('founder') && pos.includes('ceo'));
+  // Get Manager from dedicated fields
+  const manager = aboutContent?.manager ? {
+    name: aboutContent.manager,
+    position: aboutContent.manager_position || 'Manager',
+    bio: aboutContent.manager_bio || 'Manager bio coming soon',
+    photo: aboutContent.manager_photo
+  } : null;
+  
+  // Get Leader from leader fields
+  const leader = aboutContent?.leader_name ? {
+    name: aboutContent.leader_name,
+    position: aboutContent.leader_position || 'Leader',
+    bio: aboutContent.leader_bio || 'Leader bio coming soon',
+    photo: aboutContent.leader_photo
+  } : null;
+  
+  // Get team members from team_member fields with individual photos
+  const teamMembers = aboutContent?.team_members || [];
+  
+  // Map individual photos to team members in order
+  const teamMembersWithPhotos = teamMembers.map((member: any, index: number) => {
+    let photoUrl = '';
+    
+    // Map photos by index: first member gets first photo field, second gets second, etc.
+    switch (index) {
+      case 0:
+        photoUrl = aboutContent?.team_member_photoo || '';
+        break;
+      case 1:
+        photoUrl = aboutContent?.team_pic_4 || '';
+        break;
+      case 2:
+        photoUrl = aboutContent?.team_member_photo2 || '';
+        break;
+      case 3:
+        // Try the team_member_photo array for 4th member
+        if (aboutContent?.team_members && aboutContent.team_members[3]?.photo) {
+          photoUrl = aboutContent.team_members[3].photo;
+        }
+        break;
+      default:
+        photoUrl = member.photo || '';
+    }
+    
+    // Default logo if no photo is available
+    const defaultLogo = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center&auto=format&q=80';
+    
+    return {
+      ...member,
+      photo: photoUrl || defaultLogo
+    };
   });
-  
-  const cto = normalizedMembers.find((member: any) => {
-    const pos = member.position?.toLowerCase() || '';
-    return pos.includes('cto') || (pos.includes('founder') && pos.includes('cto'));
-  });
-  
-  // Get team members (exclude CEO and CTO)
-  const teamMembers = normalizedMembers.filter((member: any) => {
-    const pos = member.position?.toLowerCase() || '';
-    return !pos.includes('ceo') && !pos.includes('co-founder') && !pos.includes('cto') && !pos.includes('founder');
-  }).slice(0, 4);
-  
-  console.log('CEO:', ceo);
-  console.log('CTO:', cto);
-  console.log('Team members:', teamMembers);
 
   // Default values if no data
   const heroTitle = aboutContent?.title || "Building the future of content management";
@@ -178,7 +205,7 @@ const About = () => {
             <div className="mt-4 text-xs text-gray-400">
               <p><strong>Check browser console (F12) for detailed logs</strong></p>
             </div>
-          </div>
+        </div>
 
           <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight mt-12">
             {heroTitle.split(' ').map((word, i) => 
@@ -278,7 +305,7 @@ const About = () => {
       )}
 
       {/* Leadership Team - Flowchart Style */}
-      {(ceo || cto || teamMembers.length > 0) && (
+      {(manager || leader || teamMembers.length > 0) && (
         <section className="py-20 px-6 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-cyan-500/5">
           <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
@@ -292,52 +319,52 @@ const About = () => {
 
             {/* Flowchart Structure */}
             <div className="flex flex-col items-center space-y-8">
-              {/* CEO at top */}
-              {ceo && (
+              {/* Manager at top */}
+              {manager && (
                 <div className="flex flex-col items-center">
                   <Card className="p-8 bg-gradient-to-br from-card/90 to-card/50 backdrop-blur-md border-2 border-blue-500/40 hover:border-blue-500/60 transition-all duration-300 hover:scale-105 shadow-xl shadow-blue-500/20 w-72">
                     <div className="text-center">
                       <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500/30 to-purple-500/30 flex items-center justify-center mx-auto mb-6 overflow-hidden border-4 border-blue-500/50 shadow-lg">
                         <img 
-                          src={typeof ceo.photo === 'string' ? ceo.photo : (ceo.photo?.url || 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=faces&auto=format&q=80')}
-                          alt={ceo.name || 'CEO'}
+                          src={typeof manager.photo === 'string' ? manager.photo : (manager.photo?.url || 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=faces&auto=format&q=80')}
+                          alt={manager.name || 'Manager'}
                           className="w-28 h-28 rounded-full object-cover"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=faces&auto=format&q=80';
                           }}
                         />
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">{ceo.name || 'CEO'}</h3>
-                      <p className="text-lg text-blue-400 mb-4 font-medium">{ceo.position || 'CEO'}</p>
-                      <p className="text-muted-foreground leading-relaxed text-sm">{ceo.bio || 'Bio coming soon'}</p>
+                      <h3 className="text-2xl font-bold text-white mb-2">{manager.name || 'Manager'}</h3>
+                      <p className="text-lg text-blue-400 mb-4 font-medium">{manager.position || 'Manager'}</p>
+                      <p className="text-muted-foreground leading-relaxed text-sm">{manager.bio || 'Bio coming soon'}</p>
                     </div>
                   </Card>
                   
-                  {/* Connection line down to CTO */}
-                  {cto && (
+                  {/* Connection line down to Leader */}
+                  {leader && (
                     <div className="w-0.5 h-16 bg-gradient-to-b from-blue-500 via-purple-500 to-cyan-500 mt-8"></div>
                   )}
                 </div>
               )}
 
-              {/* CTO below CEO */}
-              {cto && (
+              {/* Leader below Manager */}
+              {leader && (
                 <div className="flex flex-col items-center">
                   <Card className="p-6 bg-gradient-to-br from-card/90 to-card/50 backdrop-blur-md border-2 border-purple-500/40 hover:border-purple-500/60 transition-all duration-300 hover:scale-105 shadow-xl shadow-purple-500/20 w-64">
                     <div className="text-center">
                       <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500/30 to-pink-500/30 flex items-center justify-center mx-auto mb-4 overflow-hidden border-4 border-purple-500/50 shadow-lg">
                         <img 
-                          src={typeof cto.photo === 'string' ? cto.photo : (cto.photo?.url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80')}
-                          alt={cto.name || 'CTO'}
+                          src={typeof leader.photo === 'string' ? leader.photo : (leader.photo?.url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80')}
+                          alt={leader.name || 'Leader'}
                           className="w-20 h-20 rounded-full object-cover"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80';
                           }}
                         />
                       </div>
-                      <h3 className="text-xl font-bold text-white mb-1">{cto.name || 'CTO'}</h3>
-                      <p className="text-base text-purple-400 mb-2 font-medium">{cto.position || 'CTO'}</p>
-                      <p className="text-muted-foreground leading-relaxed text-xs">{cto.bio || 'Bio coming soon'}</p>
+                      <h3 className="text-xl font-bold text-white mb-1">{leader.name || 'Leader'}</h3>
+                      <p className="text-base text-purple-400 mb-2 font-medium">{leader.position || 'Leader'}</p>
+                      <p className="text-muted-foreground leading-relaxed text-xs">{leader.bio || 'Bio coming soon'}</p>
                     </div>
                   </Card>
                   
@@ -348,8 +375,8 @@ const About = () => {
                 </div>
               )}
 
-              {/* Team Members T1-T4 below CTO at same level */}
-              {teamMembers.length > 0 && (
+              {/* Team Members T1-T4 below Leader at same level */}
+              {teamMembersWithPhotos.length > 0 && (
                 <div className="flex flex-col items-center w-full">
                   {/* Horizontal connecting line */}
                   <div className="relative w-full max-w-5xl mb-8 flex justify-center">
@@ -358,7 +385,7 @@ const About = () => {
                   
                   {/* Team Members row */}
                   <div className="flex flex-wrap items-start justify-center gap-6 md:gap-8 w-full max-w-6xl">
-                    {teamMembers.map((member, index) => {
+                    {teamMembersWithPhotos.map((member, index) => {
                       const photoUrl = typeof member.photo === 'string' ? member.photo : (member.photo?.url || '');
                       const fallbackImages = [
                         'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=faces&auto=format&q=80',

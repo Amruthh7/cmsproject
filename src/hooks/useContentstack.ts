@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { contentstackService, HeroContent, FeatureContent, VideoSectionContent, UseCaseContent, AboutPageContent, CareerPageContent, PricingPlansContent } from '../lib/contentstackService';
+import { contentstackService, HeroContent, FeatureContent, VideoSectionContent, UseCaseContent, AboutPageContent, CareerPageContent, PricingPlansContent, WhyChoosePlatformContent } from '../lib/contentstackService';
 
 // Custom hooks for Contentstack data
 export const useHeroContent = () => {
@@ -89,6 +89,17 @@ export const useTrustIndicators = () => {
     queryKey: ['contentstack', 'trustIndicators'],
     queryFn: () => contentstackService.getTrustIndicators(),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 3,
+  });
+};
+
+export const useWhyChoosePlatformContent = () => {
+  return useQuery<WhyChoosePlatformContent | null>({
+    queryKey: ['contentstack', 'whyChoosePlatform'],
+    queryFn: () => contentstackService.getWhyChoosePlatformContent(),
+    staleTime: 1 * 60 * 1000, // 1 minute for faster updates
+    cacheTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: true,
     retry: 3,
   });
 };

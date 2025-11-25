@@ -60,13 +60,22 @@ export interface AboutPageContent {
     value_title: string;
     value_description: string;
   }>;
+  manager?: string;
+  manager_position?: string;
+  manager_bio?: string;
+  manager_photo?: string;
+  leader_name?: string;
+  leader_position?: string;
+  leader_bio?: string;
+  leader_photo?: string;
+  team_member_photoo?: string;
+  team_pic_4?: string;
+  team_member_photo2?: string;
   team_members: Array<{
     name: string;
     position: string;
     bio: string;
-    photo?: {
-      url: string;
-    };
+    photo?: string;
   }>;
 }
 
@@ -111,20 +120,29 @@ export interface PricingPlansContent {
   }>;
 }
 
+export interface WhyChoosePlatformContent {
+  title: string;
+  description: string;
+  benefits: Array<{
+    title: string;
+    description?: string;
+    icon?: string;
+    color?: string;
+  }>;
+}
+
 // Contentstack service functions
 export const contentstackService = {
   // Get hero content
   async getHeroContent(): Promise<HeroContent | null> {
     try {
-      const result = await new Promise<any>((resolve, reject) => {
-        Stack.ContentType('hero_section').Entry.fetchAll((error: any, data: any) => {
-          if (error) reject(error);
-          else resolve(data);
-        });
-      });
-      
-      if (result && result[0]) {
-        const entry = result[0];
+      const { contentstackConfig } = await import('./contentstack');
+      const { apiKey, deliveryToken, environment, branch } = contentstackConfig as any;
+      const url = `https://cdn.contentstack.io/v3/content_types/hero_section/entries?environment=${encodeURIComponent(environment)}&locale=en-us&include_fallback=true&access_token=${encodeURIComponent(deliveryToken)}`;
+      const resp = await fetch(url, { headers: { 'api_key': apiKey, 'branch': branch } });
+      const json = await resp.json();
+      if (resp.ok && json?.entries && json.entries[0]) {
+        const entry = json.entries[0];
         return {
           title: entry.title || 'The world\'s best digital experiences start here',
           subtitle: entry.subtitle || '✨ Introducing Agent OS - The Future of Content',
@@ -149,26 +167,111 @@ export const contentstackService = {
   // Get features content
   async getFeaturesContent(): Promise<FeatureContent | null> {
     try {
-      const result = await new Promise<any>((resolve, reject) => {
-        Stack.ContentType('features').Entry.fetchAll((error: any, data: any) => {
-          if (error) reject(error);
-          else resolve(data);
+      const { contentstackConfig } = await import('./contentstack');
+      const { apiKey, deliveryToken, environment, branch } = contentstackConfig as any;
+      const url = `https://cdn.contentstack.io/v3/content_types/features/entries?environment=${encodeURIComponent(environment)}&locale=en-us&include_fallback=true&access_token=${encodeURIComponent(deliveryToken)}`;
+      const resp = await fetch(url, { headers: { 'api_key': apiKey, 'branch': branch } });
+      const json = await resp.json();
+      const result = json?.entries || [];
+      if (result.length > 0) {
+        // Get the main entry (could be single entry with arrays or multiple entries)
+        const mainEntry = result.find((e: any) => e.title && e.description) || result.find((e: any) => e.title) || result[0];
+        
+        let features = [];
+        
+        // Check if feature_title is an array (new structure: single entry with arrays)
+        if (mainEntry.feature_title && Array.isArray(mainEntry.feature_title)) {
+          // Handle array-based structure: single entry with arrays
+          const titles = mainEntry.feature_title || [];
+          const descriptions = Array.isArray(mainEntry.feature_description) ? mainEntry.feature_description : [];
+          const icons = Array.isArray(mainEntry.feature_icon) ? mainEntry.feature_icon : [];
+          
+          // Clean HTML from descriptions
+          const cleanDescription = (desc: string): string => {
+            if (!desc) return '';
+            return String(desc)
+              .replace(/<p[^>]*>/g, '')
+              .replace(/<\/p>/g, '\n\n')
+              .replace(/<h3[^>]*>.*?<\/h3>/g, '')
+              .replace(/<[^>]*>/g, '')
+              .replace(/&nbsp;/g, ' ')
+              .replace(/&amp;/g, '&')
+              .replace(/&lt;/g, '<')
+              .replace(/&gt;/g, '>')
+              .replace(/&quot;/g, '"')
+              .replace(/&#39;/g, "'")
+              .replace(/\n\s*\n\s*\n/g, '\n\n')
+              .trim();
+          };
+          
+          // Default icon mapping based on keywords in title
+          const getDefaultIcon = (title: string, index: number): string => {
+            const titleLower = title.toLowerCase();
+            if (titleLower.includes('security') || titleLower.includes('safe') || titleLower.includes('encrypt')) return 'shield';
+            if (titleLower.includes('performance') || titleLower.includes('speed') || titleLower.includes('fast') || titleLower.includes('lightning')) return 'zap';
+            if (titleLower.includes('delivery') || titleLower.includes('channel') || titleLower.includes('omnichannel')) return 'globe';
+            if (titleLower.includes('api') || titleLower.includes('developer') || titleLower.includes('code') || titleLower.includes('flexibility')) return 'code';
+            if (titleLower.includes('scalable') || titleLower.includes('infrastructure') || titleLower.includes('cloud')) return 'layers';
+            if (titleLower.includes('collaboration') || titleLower.includes('team') || titleLower.includes('workflow')) return 'users';
+            if (titleLower.includes('insight') || titleLower.includes('analytics') || titleLower.includes('data')) return 'zap';
+            if (titleLower.includes('visual') || titleLower.includes('edit') || titleLower.includes('editor')) return 'code';
+            // Default to cycling through icons based on index
+            const defaultIcons = ['zap', 'globe', 'shield', 'code', 'layers', 'users'];
+            return defaultIcons[index % defaultIcons.length];
+          };
+          
+          // Map arrays to features
+          console.log('🔄 Mapping features from arrays:', {
+            titlesCount: titles.length,
+            descriptionsCount: descriptions.length,
+            iconsCount: icons.length
+          });
+          
+          features = titles.map((title: string, index: number) => {
+            const iconName = (icons[index] || '').toLowerCase().trim();
+            const finalIcon = iconName || getDefaultIcon(title, index);
+            const desc = cleanDescription(descriptions[index] || '');
+            const feature = {
+              icon: finalIcon,
+              title: title || '',
+              description: desc,
+              image: mainEntry.feature_image ? { 
+                url: (mainEntry.feature_image.url || (typeof mainEntry.feature_image === 'string' ? mainEntry.feature_image : '')) 
+              } : undefined
+            };
+            console.log(`  ✓ Feature ${index + 1}: "${feature.title}" (icon: ${feature.icon})`);
+            return feature;
+          }).filter((f: any) => f.title); // Filter out features without titles
+          
+          console.log(`✅ Created ${features.length} features from ${titles.length} titles`);
+        } else {
+          // Handle old structure: multiple entries, each entry is a feature
+          features = result
+            .filter((entry: any) => entry.feature_title || entry.feature_icon)
+            .map((entry: any) => ({
+              icon: (entry.feature_icon || '').toLowerCase() || 'zap',
+              title: entry.feature_title || '',
+              description: entry.feature_description || '',
+              image: entry.feature_image ? { 
+                url: (entry.feature_image.url || (typeof entry.feature_image === 'string' ? entry.feature_image : '')) 
+              } : undefined
+            }))
+            .filter((f: any) => f.title);
+        }
+        
+        console.log('📊 Features fetched:', features.length, 'features from Contentstack');
+        console.log('📋 Feature data structure:', {
+          hasArrayStructure: mainEntry.feature_title && Array.isArray(mainEntry.feature_title),
+          titlesCount: Array.isArray(mainEntry.feature_title) ? mainEntry.feature_title.length : 'N/A',
+          descriptionsCount: Array.isArray(mainEntry.feature_description) ? mainEntry.feature_description.length : 'N/A',
+          iconsCount: Array.isArray(mainEntry.feature_icon) ? mainEntry.feature_icon.length : 'N/A',
+          rawTitles: Array.isArray(mainEntry.feature_title) ? mainEntry.feature_title : 'Not array',
+          features: features.map((f: any) => ({ title: f.title, icon: f.icon }))
         });
-      });
-      
-      if (result && result.length > 0) {
-        // Get the first entry for title/description, then collect all features
-        const firstEntry = result[0];
-        const features = result.map((entry: any) => ({
-          icon: entry.feature_icon?.toLowerCase() || 'zap',
-          title: entry.feature_title || '',
-          description: entry.feature_description || '',
-          image: entry.feature_image ? { url: entry.feature_image.url || entry.feature_image } : undefined
-        })).filter(f => f.title); // Filter out empty entries
         
         return {
-          title: firstEntry.title || 'Powerful Features for Modern Teams',
-          description: firstEntry.description || 'Built for the creditworthy. Experience the ascension yourself with tools designed for trustworthy individuals.',
+          title: mainEntry.title || 'Powerful Features for Modern Teams',
+          description: mainEntry.description || 'Built for the creditworthy. Experience the ascension yourself with tools designed for trustworthy individuals.',
           features: features.length > 0 ? features : [
             {
               icon: 'zap',
@@ -219,14 +322,13 @@ export const contentstackService = {
   // Get video sections content
   async getVideoSectionsContent(): Promise<VideoSectionContent[]> {
     try {
-      const result = await new Promise<any>((resolve, reject) => {
-        Stack.ContentType('video_sections').Entry.fetchAll((error: any, data: any) => {
-          if (error) reject(error);
-          else resolve(data);
-        });
-      });
-      
-      if (result && result.length > 0) {
+      const { contentstackConfig } = await import('./contentstack');
+      const { apiKey, deliveryToken, environment, branch } = contentstackConfig as any;
+      const url = `https://cdn.contentstack.io/v3/content_types/video_sections/entries?environment=${encodeURIComponent(environment)}&locale=en-us&include_fallback=true&access_token=${encodeURIComponent(deliveryToken)}`;
+      const resp = await fetch(url, { headers: { 'api_key': apiKey, 'branch': branch } });
+      const json = await resp.json();
+      const result = json?.entries || [];
+      if (result.length > 0) {
         return result.map((entry: any) => ({
           title: entry.title || 'Modernize your CMS',
           description: entry.description || 'Create experiences faster across more channels with an easy-to-use, future-ready platform that scales with your business needs.',
@@ -265,14 +367,13 @@ export const contentstackService = {
   // Get use cases content
   async getUseCasesContent(): Promise<UseCaseContent | null> {
     try {
-      const result = await new Promise<any>((resolve, reject) => {
-        Stack.ContentType('use_cases').Entry.fetchAll((error: any, data: any) => {
-          if (error) reject(error);
-          else resolve(data);
-        });
-      });
-      
-      if (result && result.length > 0) {
+      const { contentstackConfig } = await import('./contentstack');
+      const { apiKey, deliveryToken, environment, branch } = contentstackConfig as any;
+      const url = `https://cdn.contentstack.io/v3/content_types/use_cases/entries?environment=${encodeURIComponent(environment)}&locale=en-us&include_fallback=true&access_token=${encodeURIComponent(deliveryToken)}`;
+      const resp = await fetch(url, { headers: { 'api_key': apiKey, 'branch': branch } });
+      const json = await resp.json();
+      const result = json?.entries || [];
+      if (result.length > 0) {
         // Find entry with section_title (main entry) or use first entry
         const mainEntry = result.find((e: any) => e.section_title) || result[0];
         
@@ -301,14 +402,13 @@ export const contentstackService = {
   // Get trust indicators
   async getTrustIndicators(): Promise<Array<{ metric_value: string; label: string }>> {
     try {
-      const result = await new Promise<any>((resolve, reject) => {
-        Stack.ContentType('trust_indicators').Entry.fetchAll((error: any, data: any) => {
-          if (error) reject(error);
-          else resolve(data);
-        });
-      });
-      
-      if (result && result.length > 0) {
+      const { contentstackConfig } = await import('./contentstack');
+      const { apiKey, deliveryToken, environment, branch } = contentstackConfig as any;
+      const url = `https://cdn.contentstack.io/v3/content_types/trust_indicators/entries?environment=${encodeURIComponent(environment)}&locale=en-us&include_fallback=true&access_token=${encodeURIComponent(deliveryToken)}`;
+      const resp = await fetch(url, { headers: { 'api_key': apiKey, 'branch': branch } });
+      const json = await resp.json();
+      const result = json?.entries || [];
+      if (result.length > 0) {
         return result.map((entry: any) => ({
           metric_value: entry.metric_value || '',
           label: entry.label || ''
@@ -325,13 +425,11 @@ export const contentstackService = {
   async testConnection(): Promise<void> {
     try {
       console.log('=== TESTING Contentstack Connection ===');
-      // Try to fetch a simple entry to test the connection
-      const result = await new Promise<any>((resolve, reject) => {
-        Stack.ContentType('about_page').Entry.fetchAll((error: any, data: any) => {
-          if (error) reject(error);
-          else resolve(data);
-        });
-      });
+      const { contentstackConfig } = await import('./contentstack');
+      const { apiKey, deliveryToken, environment, branch } = contentstackConfig as any;
+      const url = `https://cdn.contentstack.io/v3/content_types/about_page/entries?environment=${encodeURIComponent(environment)}&locale=en-us&include_fallback=true&access_token=${encodeURIComponent(deliveryToken)}`;
+      const resp = await fetch(url, { headers: { 'api_key': apiKey, 'branch': branch } });
+      const result = await resp.json();
       console.log('✅ Connection successful!');
       console.log('Result:', result);
     } catch (error: any) {
@@ -342,127 +440,52 @@ export const contentstackService = {
   // Get about page content
   async getAboutPageContent(): Promise<AboutPageContent | null> {
     try {
-      console.log('=== STARTING Contentstack About Page Fetch ===');
-      console.log('Stack config:', {
-        api_key: (Stack as any).config?.api_key || 'not accessible',
-        environment: (Stack as any).config?.environment || 'not accessible',
-        region: (Stack as any).config?.region || 'not accessible'
-      });
-      
-      // Try different content type name variations
-      const contentTypeVariations = ['about_page', 'about-page', 'aboutpage'];
-      let result: any = null;
-      let usedContentType = '';
-      
-      for (const contentType of contentTypeVariations) {
-        try {
-          console.log(`🔄 Trying content type: "${contentType}"`);
-          result = await new Promise<any>((resolve, reject) => {
-            Stack.ContentType(contentType).Entry.fetchAll((error: any, data: any) => {
-              if (error) reject(error);
-              else resolve(data);
-            });
-          });
-          
-          // Handle different response formats
-          if (result && !Array.isArray(result)) {
-            if ((result as any).entries) {
-              result = (result as any).entries;
-            } else if ((result as any).items) {
-              result = (result as any).items;
-            } else {
-              result = [result];
-            }
-          }
-          
-          if (result && Array.isArray(result) && result.length > 0) {
-            console.log(`✅ Success! Found ${result.length} entries using content type: "${contentType}"`);
-            usedContentType = contentType;
-            break;
-          } else if (result && Array.isArray(result) && result.length === 0) {
-            console.log(`⚠️  Content type "${contentType}" EXISTS but has NO ENTRIES`);
-            console.log(`⚠️  ⚠️  ⚠️  THIS IS THE PROBLEM! ⚠️  ⚠️  ⚠️`);
-            console.log(`⚠️  SOLUTION:`);
-            console.log(`    1. Go to Contentstack Dashboard`);
-            console.log(`    2. Navigate to: Content → "${contentType}" → Entries`);
-            console.log(`    3. Either CREATE a new entry OR open existing entry`);
-            console.log(`    4. Fill in the fields (hero_title, leader_name, etc.)`);
-            console.log(`    5. Click "Publish" button (green button, top right)`);
-            console.log(`    6. IMPORTANT: Select "cmsproject" from environment dropdown`);
-            console.log(`    7. Click "Publish" to confirm`);
-            console.log(`    8. Wait for confirmation: "Published to cmsproject"`);
-            console.log(`    9. Come back here and click "Refresh Content"`);
-          } else {
-            console.log(`⚠️  Content type "${contentType}" response format unexpected:`, result);
-          }
-        } catch (error: any) {
-          console.log(`❌ Content type "${contentType}" failed:`, error?.errorMessage || error?.message);
-          // Continue to next variation
+      // Prefer CDN Delivery API with proper headers (api_key + branch)
+      const { contentstackConfig } = await import('./contentstack');
+      const { apiKey, deliveryToken, environment, branch } = contentstackConfig as any;
+
+      const url = `https://cdn.contentstack.io/v3/content_types/about_page/entries?environment=${encodeURIComponent(environment)}&locale=en-us&include_fallback=true&access_token=${encodeURIComponent(deliveryToken)}`;
+      const resp = await fetch(url, {
+        headers: {
+          'api_key': apiKey,
+          'branch': branch,
+          // access_token goes in query for CDN; keep header lean
         }
+      });
+      const json = await resp.json();
+      if (!resp.ok || !json?.entries || json.entries.length === 0) {
+        console.error('CDN fetch failed or empty:', json);
+        return null;
       }
-      
-      if (!result || !Array.isArray(result) || result.length === 0) {
-        console.error('');
-        console.error('═══════════════════════════════════════════════════════════');
-        console.error('❌ FINAL RESULT: No entries found in any content type');
-        console.error('═══════════════════════════════════════════════════════════');
-        console.error('');
-        console.error('📋 CONTENT TYPES TESTED:', contentTypeVariations);
-        console.error('');
-        console.error('✅ WHAT THIS MEANS:');
-        console.error('   - Content types may exist, but have NO ENTRIES');
-        console.error('   - OR entries exist but are NOT PUBLISHED to "cmsproject"');
-        console.error('');
-        console.error('🔧 ACTION REQUIRED IN CONTENTSTACK:');
-        console.error('   1. Open Contentstack Dashboard');
-        console.error('   2. Go to: Content → [Your Content Type] → Entries');
-        console.error('   3. Create entry OR open existing entry');
-        console.error('   4. Fill in fields and SAVE');
-        console.error('   5. Click "Publish" button (top right)');
-        console.error('   6. Select "cmsproject" from environment dropdown');
-        console.error('   7. Click "Publish"');
-        console.error('   8. Verify status shows "Published to cmsproject"');
-        console.error('');
-        console.error('🧪 TEST AFTER PUBLISHING:');
-        console.error(`   Open this URL: https://cdn.contentstack.io/v3/content_types/about_page/entries?environment=cmsproject&access_token=cs05eb74f9e80cece6d90fd6e3`);
-        console.error('   If you see JSON data → Working! Refresh the page.');
-        console.error('   If empty array [] → Entry not published yet');
-        console.error('');
-        console.error('═══════════════════════════════════════════════════════════');
-        console.error('');
-        throw new Error('No entries found for about page content type');
-      }
-      
-      console.log(`✅ Using content type: "${usedContentType || 'about_page'}"`);
-      console.log(`✅ Found ${result.length} entries`);
-      console.log('Full result JSON:', JSON.stringify(result, null, 2));
+
+      const result = json.entries as any[];
       
       // Find entry with hero_title (main entry) or use first entry
-      const mainEntry = result.find((e: any) => e.entry?.hero_title || e.hero_title) || result[0];
-      
-      // Extract the actual entry data (handle both direct and nested structures)
-      const entryData = mainEntry.entry || mainEntry;
-      
-      console.log('📋 Entry data structure:', entryData);
-      console.log('📋 Available fields:', Object.keys(entryData));
+      const mainEntry = result.find((e: any) => e.hero_title) || result[0];
+      const entryData = mainEntry;
       
       // Helper function to extract photo URL
       const extractPhotoUrl = (photo: any): string => {
         if (!photo) return '';
-        if (typeof photo === 'string') {
-          return photo;
-        } else if (photo.url) {
-          return photo.url;
-        } else if (typeof photo === 'object' && photo.download_url) {
-          return photo.download_url;
-        }
+        if (typeof photo === 'string') return photo;
+        if (photo.url) return photo.url;
+        if (typeof photo === 'object' && photo.download_url) return photo.download_url;
         return '';
       };
       
-      // Helper function to clean HTML tags from bio
+      // Helper function to clean HTML tags and entities from bio
       const cleanBio = (bio: string): string => {
         if (!bio) return '';
-        return bio.replace(/<[^>]*>/g, '').trim();
+        return bio
+          .replace(/<[^>]*>/g, '') // Remove HTML tags
+          .replace(/&nbsp;/g, ' ') // Replace &nbsp; with regular space
+          .replace(/&amp;/g, '&') // Replace &amp; with &
+          .replace(/&lt;/g, '<') // Replace &lt; with <
+          .replace(/&gt;/g, '>') // Replace &gt; with >
+          .replace(/&quot;/g, '"') // Replace &quot; with "
+          .replace(/&#39;/g, "'") // Replace &#39; with '
+          .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+          .trim();
       };
       
       // Collect leaders from entries - handle both single leader and multiple leaders
@@ -492,35 +515,31 @@ export const contentstackService = {
         const memberNames = Array.isArray(entryData.team_member_name) ? entryData.team_member_name : [entryData.team_member_name];
         const memberPositions = Array.isArray(entryData.team_member_position) ? entryData.team_member_position : [entryData.team_member_position];
         const memberBios = Array.isArray(entryData.team_member_bio) ? entryData.team_member_bio : [entryData.team_member_bio];
-        const memberPhotos = Array.isArray(entryData.team_member_photo) ? entryData.team_member_photo : [entryData.team_member_photo];
         
-        // Use different fallback images based on name
-        const fallbackImages = [
-          'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=faces&auto=format&q=80',
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80',
-          'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=faces&auto=format&q=80',
-          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80'
+        // Build array-based photos (multiple) if provided
+        const photoArrayRaw = Array.isArray(entryData.team_member_photo) ? entryData.team_member_photo : [];
+        const photoArray: string[] = photoArrayRaw.map((p: any) => extractPhotoUrl(p));
+
+        // Individual photo fields for each team member - map by index with fallback to array photos
+        const individualPhotos = [
+          extractPhotoUrl(entryData.team_member_photoo) || photoArray[0] || '', // Team member 1 (Abdu)
+          extractPhotoUrl(entryData.team_pic_4) || photoArray[1] || '',         // Team member 2 (Nidhi)
+          extractPhotoUrl(entryData.team_member_photo2) || photoArray[2] || '', // Team member 3 (Manoj)
+          photoArray[3] || extractPhotoUrl(entryData.team_member_photo) || ''   // Team member 4 (Lavanya)
         ];
         
         memberNames.forEach((name: string, index: number) => {
-          const photoUrl = extractPhotoUrl(memberPhotos[index]);
-          const nameMatch = name?.toLowerCase() || '';
-          let defaultPhoto = fallbackImages[0];
-          if (nameMatch.includes('emily')) {
-            defaultPhoto = fallbackImages[0];
-          } else if (nameMatch.includes('david')) {
-            defaultPhoto = fallbackImages[1];
-          } else if (nameMatch.includes('lisa')) {
-            defaultPhoto = fallbackImages[2];
-          } else {
-            defaultPhoto = fallbackImages[3];
-          }
+          // Get photo by index: first member gets first photo field, second gets second, etc.
+          let photoUrl = individualPhotos[index] || '';
+          
+          // Default logo if no photo is available
+          const defaultLogo = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center&auto=format&q=80';
           
           teamMembers.push({
             name: name,
             position: memberPositions[index] || '',
             bio: cleanBio(memberBios[index] || ''),
-            photo: photoUrl || defaultPhoto
+            photo: photoUrl || defaultLogo
           });
         });
       }
@@ -534,10 +553,6 @@ export const contentstackService = {
         });
       }
         
-      console.log('✅ Processed leaders:', leaders);
-      console.log('✅ Processed team members:', teamMembers);
-      console.log('✅ Total team_members to return:', [...leaders, ...teamMembers].length);
-      
       const finalData = {
         title: entryData.hero_title || 'Building the future of content management',
         subtitle: cleanBio(entryData.hero_description || 'We\'re on a mission to revolutionize how companies create, manage, and deliver digital experiences.'),
@@ -545,10 +560,24 @@ export const contentstackService = {
         mission_statement: cleanBio(entryData.mission_statement || 'To empower teams with intelligent content management tools that adapt to their needs and scale with their growth.'),
         vision_statement: cleanBio(entryData.vision_statement || 'A world where every digital experience is perfectly tailored to its audience, powered by intelligent content management.'),
         values: values.length > 0 ? values : [],
-        team_members: [...leaders, ...teamMembers] // Combine leaders and team members, but keep them separate for display
+        // Manager fields
+        manager: entryData.manager || '',
+        manager_position: entryData.manager_position || '',
+        manager_bio: cleanBio(entryData.manager_bio || ''),
+        manager_photo: extractPhotoUrl(entryData.manager_photo),
+        // Leader fields
+        leader_name: entryData.leader_name || '',
+        leader_position: entryData.leader_position || '',
+        leader_bio: cleanBio(entryData.leader_bio || ''),
+        leader_photo: extractPhotoUrl(entryData.leader_photo),
+        // Individual team member photos
+        team_member_photoo: extractPhotoUrl(entryData.team_member_photoo),
+        team_pic_4: extractPhotoUrl(entryData.team_pic_4),
+        team_member_photo2: extractPhotoUrl(entryData.team_member_photo2),
+        // Team members
+        team_members: teamMembers // Use team members directly
       };
       
-      console.log('✅ Returning About Page Content:', JSON.stringify(finalData, null, 2));
       return finalData;
     } catch (error: any) {
       console.error('❌ ERROR fetching about page content:', error);
@@ -608,57 +637,139 @@ export const contentstackService = {
   // Get career page content
   async getCareerPageContent(): Promise<CareerPageContent | null> {
     try {
-      const result = await new Promise<any>((resolve, reject) => {
-        Stack.ContentType('career_page').Entry.fetchAll((error: any, data: any) => {
-          if (error) reject(error);
-          else resolve(data);
-        });
-      });
-      
-      if (result && result.length > 0) {
+      const { contentstackConfig } = await import('./contentstack');
+      const { apiKey, deliveryToken, environment, branch } = contentstackConfig as any;
+      const url = `https://cdn.contentstack.io/v3/content_types/career_page/entries?environment=${encodeURIComponent(environment)}&locale=en-us&include_fallback=true&access_token=${encodeURIComponent(deliveryToken)}`;
+      const resp = await fetch(url, { headers: { 'api_key': apiKey, 'branch': branch } });
+      const json = await resp.json();
+      const result = json?.entries || [];
+      if (result.length > 0) {
         // Find entry with hero_title (main entry) or use first entry
         const mainEntry = result.find((e: any) => e.hero_title) || result[0];
         
-        // Collect company history
-        const companyHistory = result
-          .filter((e: any) => e.company_history_year)
-          .map((e: any) => ({
-            year: e.company_history_year,
-            title: e.company_history_title,
-            description: e.company_history_description
-          }));
+        // Helper to strip HTML tags/entities from text
+        const cleanText = (text: string): string => {
+          if (!text) return '';
+          return String(text)
+            .replace(/<[^>]*>/g, '')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/\s+/g, ' ')
+            .trim();
+        };
+
+        // Helper to clean pricing descriptions with proper bullet point formatting
+        const cleanPricingDescription = (text: string): string => {
+          if (!text) return '';
+          return String(text)
+            .replace(/<ul>/g, '')
+            .replace(/<\/ul>/g, '')
+            .replace(/<li>/g, '\n• ')
+            .replace(/<\/li>/g, '\n\n')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/\n\s*\n/g, '\n\n') // Ensure double newlines between bullet points
+            .trim();
+        };
+
+        // Collect company history - handle arrays properly
+        const companyHistory = [];
+        result.forEach((entry: any) => {
+          if (entry.company_history_year && Array.isArray(entry.company_history_year)) {
+            // Handle array format - create separate entries for each year
+            entry.company_history_year.forEach((year: string, index: number) => {
+              companyHistory.push({
+                year: year,
+                title: cleanText(entry.company_history_title?.[index] || ''),
+                description: cleanText(entry.company_history_description?.[index] || '')
+              });
+            });
+          } else if (entry.company_history_year) {
+            // Handle single entry format
+            companyHistory.push({
+              year: entry.company_history_year,
+              title: cleanText(entry.company_history_title || ''),
+              description: cleanText(entry.company_history_description || '')
+            });
+          }
+        });
         
-        // Collect open positions
-        const openPositions = result
-          .filter((e: any) => e.job_title)
-          .map((e: any) => ({
-            title: e.job_title,
-            location: e.job_location,
-            type: e.job_type,
-            department: e.job_department,
-            description: e.job_description
-          }));
+        // Collect open positions - handle arrays properly
+        const openPositions: Array<{ title: string; location: string; type: string; department: string; description: string }> = [];
+        result.forEach((entry: any) => {
+          if (entry.job_title && Array.isArray(entry.job_title)) {
+            entry.job_title.forEach((title: string, index: number) => {
+              openPositions.push({
+                title: cleanText(title),
+                location: cleanText(entry.job_location?.[index] || ''),
+                type: cleanText(entry.job_type?.[index] || ''),
+                department: cleanText(entry.job_department?.[index] || ''),
+                description: cleanText(entry.job_description?.[index] || '')
+              });
+            });
+          } else if (entry.job_title) {
+            openPositions.push({
+              title: cleanText(entry.job_title),
+              location: cleanText(entry.job_location || ''),
+              type: cleanText(entry.job_type || ''),
+              department: cleanText(entry.job_department || ''),
+              description: cleanText(entry.job_description || '')
+            });
+          }
+        });
         
-        // Collect benefits
-        const benefits = result
-          .filter((e: any) => e.benefit_title)
-          .map((e: any) => ({
-            title: e.benefit_title,
-            description: e.benefit_description
-          }));
+        // Collect benefits - handle arrays properly
+        const benefits = [];
+        result.forEach((entry: any) => {
+          if (entry.benefit_title && Array.isArray(entry.benefit_title)) {
+            // Handle array format - create separate entries for each benefit
+            entry.benefit_title.forEach((title: string, index: number) => {
+              benefits.push({
+                title: cleanText(title),
+                description: cleanText(entry.benefit_description?.[index] || '')
+              });
+            });
+          } else if (entry.benefit_title) {
+            // Handle single entry format
+            benefits.push({
+              title: cleanText(entry.benefit_title),
+              description: cleanText(entry.benefit_description || '')
+            });
+          }
+        });
         
-        // Collect company stats
-        const companyStats = result
-          .filter((e: any) => e.company_stat_value)
-          .map((e: any) => ({
-            value: e.company_stat_value,
-            label: e.company_stat_label
-          }));
+        // Collect company stats - handle arrays properly
+        const companyStats = [];
+        result.forEach((entry: any) => {
+          if (entry.company_stat_value && Array.isArray(entry.company_stat_value)) {
+            // Handle array format - create separate entries for each stat
+            entry.company_stat_value.forEach((value: string, index: number) => {
+              companyStats.push({
+                value: cleanText(value),
+                label: cleanText(entry.company_stat_label?.[index] || '')
+              });
+            });
+          } else if (entry.company_stat_value) {
+            // Handle single entry format
+            companyStats.push({
+              value: cleanText(entry.company_stat_value),
+              label: cleanText(entry.company_stat_label || '')
+            });
+          }
+        });
         
         return {
-          title: mainEntry.hero_title || 'Join Our Mission',
-          subtitle: mainEntry.hero_description || 'Build the future of content management with a team that\'s passionate about innovation, collaboration, and making a real impact.',
-          description: mainEntry.hero_description || 'We believe in taking care of our team so they can take care of our customers.',
+          title: cleanText(mainEntry.hero_title || 'Join Our Mission'),
+          subtitle: cleanText(mainEntry.hero_description || 'Build the future of content management with a team that\'s passionate about innovation, collaboration, and making a real impact.'),
+          description: cleanText(mainEntry.hero_description || 'We believe in taking care of our team so they can take care of our customers.'),
           company_stats: companyStats.length > 0 ? companyStats : [],
           company_history: companyHistory.length > 0 ? companyHistory : [],
           open_positions: openPositions.length > 0 ? openPositions : [],
@@ -675,53 +786,281 @@ export const contentstackService = {
   // Get pricing plans content
   async getPricingPlansContent(): Promise<PricingPlansContent | null> {
     try {
-      const result = await new Promise<any>((resolve, reject) => {
-        Stack.ContentType('pricing_plans').Entry.fetchAll((error: any, data: any) => {
-          if (error) reject(error);
-          else resolve(data);
-        });
-      });
+      const { contentstackConfig } = await import('./contentstack');
+      const { apiKey, deliveryToken, environment, branch } = contentstackConfig as any;
+      const url = `https://cdn.contentstack.io/v3/content_types/pricing_plans/entries?environment=${encodeURIComponent(environment)}&locale=en-us&include_fallback=true&access_token=${encodeURIComponent(deliveryToken)}`;
+      const resp = await fetch(url, { headers: { 'api_key': apiKey, 'branch': branch } });
+      const json = await resp.json();
       
-      if (result && result.length > 0) {
-        // Find entry with section_title (main entry) or use first entry
-        const mainEntry = result.find((e: any) => e.section_title) || result[0];
+      // Helper to clean pricing descriptions with proper formatting
+      const cleanPricingDescription = (text: string): string => {
+        if (!text) return '';
+        return String(text)
+          .replace(/<ul[^>]*>/g, '')
+          .replace(/<\/ul>/g, '')
+          .replace(/<li[^>]*>/g, '\n• ')
+          .replace(/<\/li>/g, '\n')
+          .replace(/<[^>]*>/g, '')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/\n\s*\n/g, '\n')
+          .trim();
+      };
+      
+      const result = json?.entries || [];
+      if (result.length > 0) {
+        // Find entry with section_title or plans group (main entry) or use first entry
+        const mainEntry = result.find((e: any) => e.section_title || e.plans) || result[0];
         
-        // Group plans by plan_name (multiple entries can have same plan_name with different features)
-        const plansMap = new Map<string, any>();
+        const plans = [];
         
-        result
-          .filter((e: any) => e.plan_name)
-          .forEach((entry: any) => {
-            const planName = entry.plan_name;
-            if (!plansMap.has(planName)) {
-              plansMap.set(planName, {
-                plan_name: entry.plan_name,
-                price: entry.price,
-                period: entry.period,
-                description: entry.plan_description || entry.description || '',
-                features: [],
-                is_popular: entry.is_popular || false
+        // Check if entry has a 'plans' group field (single entry with nested plans)
+        if (mainEntry.plans && Array.isArray(mainEntry.plans)) {
+          // Handle group field structure: single entry with plans array
+          mainEntry.plans.forEach((plan: any) => {
+            const planFeatures = [];
+            
+            // Extract features from plan object
+            if (plan.features && Array.isArray(plan.features)) {
+              plan.features.forEach((feature: any) => {
+                if (typeof feature === 'string') {
+                  planFeatures.push({ feature: feature });
+                } else if (feature.feature) {
+                  planFeatures.push({ feature: feature.feature });
+                }
               });
             }
             
-            // Add feature if exists
-            if (entry.feature) {
-              const plan = plansMap.get(planName)!;
-              plan.features.push({ feature: entry.feature });
-            }
+            plans.push({
+              plan_name: plan.plan_name || '',
+              price: plan.price || '',
+              period: plan.period || '',
+              description: cleanPricingDescription(plan.description || plan.plan_description || ''),
+              features: planFeatures,
+              is_popular: plan.is_popular || false
+            });
           });
+        } else if (mainEntry.plan_name && Array.isArray(mainEntry.plan_name)) {
+          // Handle array format - single entry with arrays of plan data
+          mainEntry.plan_name.forEach((planName: string, index: number) => {
+            const planFeatures = [];
+            
+            // Handle features - could be array of strings or array of objects
+            if (mainEntry.feature && Array.isArray(mainEntry.feature)) {
+              // Group features by plan if multiple plans exist
+              const featuresPerPlan = Math.floor(mainEntry.feature.length / mainEntry.plan_name.length);
+              const startIndex = index * featuresPerPlan;
+              const endIndex = index === mainEntry.plan_name.length - 1 ? mainEntry.feature.length : startIndex + featuresPerPlan;
+              
+              mainEntry.feature.slice(startIndex, endIndex).forEach((feature: any) => {
+                if (typeof feature === 'string') {
+                  planFeatures.push({ feature: feature });
+                } else if (feature.feature) {
+                  planFeatures.push({ feature: feature.feature });
+                }
+              });
+            } else if (mainEntry.features && Array.isArray(mainEntry.features)) {
+              // Handle nested features array
+              const planFeaturesArray = mainEntry.features[index] || [];
+              if (Array.isArray(planFeaturesArray)) {
+                planFeaturesArray.forEach((feature: any) => {
+                  if (typeof feature === 'string') {
+                    planFeatures.push({ feature: feature });
+                  } else if (feature.feature) {
+                    planFeatures.push({ feature: feature.feature });
+                  }
+                });
+              }
+            }
+            
+            plans.push({
+              plan_name: planName,
+              price: Array.isArray(mainEntry.price) ? (mainEntry.price[index] || '') : mainEntry.price || '',
+              period: Array.isArray(mainEntry.period) ? (mainEntry.period[index] || '') : mainEntry.period || '',
+              description: cleanPricingDescription(
+                Array.isArray(mainEntry.plan_description) 
+                  ? (mainEntry.plan_description[index] || '') 
+                  : (mainEntry.plan_description || mainEntry.description || '')
+              ),
+              features: planFeatures,
+              is_popular: Array.isArray(mainEntry.is_popular) ? (mainEntry.is_popular[index] || false) : (mainEntry.is_popular || false)
+            });
+          });
+        } else {
+          // Handle multiple entries format - one entry per plan
+          const plansMap = new Map<string, any>();
+          
+          result
+            .filter((e: any) => e.plan_name)
+            .forEach((entry: any) => {
+              const planName = Array.isArray(entry.plan_name) ? entry.plan_name[0] : entry.plan_name;
+              if (!planName) return;
+              
+              if (!plansMap.has(planName)) {
+                const planFeatures = [];
+                
+                // Extract features
+                if (entry.features && Array.isArray(entry.features)) {
+                  entry.features.forEach((feature: any) => {
+                    if (typeof feature === 'string') {
+                      planFeatures.push({ feature: feature });
+                    } else if (feature.feature) {
+                      planFeatures.push({ feature: feature.feature });
+                    }
+                  });
+                } else if (entry.feature) {
+                  if (Array.isArray(entry.feature)) {
+                    entry.feature.forEach((feature: any) => {
+                      if (typeof feature === 'string') {
+                        planFeatures.push({ feature: feature });
+                      } else if (feature.feature) {
+                        planFeatures.push({ feature: feature.feature });
+                      }
+                    });
+                  } else if (typeof entry.feature === 'string') {
+                    planFeatures.push({ feature: entry.feature });
+                  } else if (entry.feature.feature) {
+                    planFeatures.push({ feature: entry.feature.feature });
+                  }
+                }
+                
+                plansMap.set(planName, {
+                  plan_name: planName,
+                  price: entry.price || '',
+                  period: entry.period || '',
+                  description: cleanPricingDescription(entry.plan_description || entry.description || ''),
+                  features: planFeatures,
+                  is_popular: entry.is_popular || false
+                });
+              } else {
+                // Add additional features to existing plan
+                const plan = plansMap.get(planName)!;
+                if (entry.feature) {
+                  if (typeof entry.feature === 'string') {
+                    plan.features.push({ feature: entry.feature });
+                  } else if (entry.feature.feature) {
+                    plan.features.push({ feature: entry.feature.feature });
+                  }
+                }
+              }
+            });
+          
+          plans.push(...Array.from(plansMap.values()));
+        }
         
-        const plans = Array.from(plansMap.values());
-        
+        console.log('📊 Pricing plans fetched:', plans.length, 'plans');
+        console.log('📊 Pricing data structure:', {
+          title: mainEntry.section_title || mainEntry.title,
+          description: mainEntry.section_description || mainEntry.description,
+          plansCount: plans.length
+        });
+
+        // Clean description to remove HTML tags, especially <p> tags
+        const cleanDescription = (desc: string): string => {
+          if (!desc) return '';
+          return String(desc)
+            .replace(/<p[^>]*>/g, '')
+            .replace(/<\/p>/g, '\n\n')
+            .replace(/<[^>]*>/g, '')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/\n\s*\n\s*\n/g, '\n\n')
+            .trim();
+        };
+
         return {
-          title: mainEntry.section_title || 'Choose Your Plan',
-          description: mainEntry.section_description || 'Start free and scale as you grow. All plans include our core features.',
+          title: mainEntry.section_title || mainEntry.title || 'Choose Your Plan',
+          description: cleanDescription(mainEntry.section_description || mainEntry.description || 'Start free and scale as you grow. All plans include our core features.'),
           plans: plans.length > 0 ? plans : []
         };
       }
+      
+      console.warn('⚠️ No pricing plans entries found in Contentstack');
       return null;
     } catch (error) {
-      console.error('Error fetching pricing plans content:', error);
+      console.error('❌ Error fetching pricing plans content:', error);
+      return null;
+    }
+  },
+
+  // Get why choose platform content
+  async getWhyChoosePlatformContent(): Promise<WhyChoosePlatformContent | null> {
+    try {
+      const { contentstackConfig } = await import('./contentstack');
+      const { apiKey, deliveryToken, environment, branch } = contentstackConfig as any;
+      const url = `https://cdn.contentstack.io/v3/content_types/why_choose_platform/entries?environment=${encodeURIComponent(environment)}&locale=en-us&include_fallback=true&access_token=${encodeURIComponent(deliveryToken)}`;
+      const resp = await fetch(url, { headers: { 'api_key': apiKey, 'branch': branch } });
+      const json = await resp.json();
+      const result = json?.entries || [];
+      
+      if (result.length > 0) {
+        const mainEntry = result[0];
+        
+        // Check if benefit_title is an array
+        if (mainEntry.benefit_title && Array.isArray(mainEntry.benefit_title)) {
+          const titles = mainEntry.benefit_title || [];
+          const descriptions = Array.isArray(mainEntry.benefit_description) ? mainEntry.benefit_description : [];
+          const icons = Array.isArray(mainEntry.benefit_icon) ? mainEntry.benefit_icon : [];
+          const colors = Array.isArray(mainEntry.benefit_color) ? mainEntry.benefit_color : [];
+          
+          // Clean HTML from descriptions
+          const cleanDescription = (desc: string): string => {
+            if (!desc) return '';
+            return String(desc)
+              .replace(/<p[^>]*>/g, '')
+              .replace(/<\/p>/g, '\n\n')
+              .replace(/<[^>]*>/g, '')
+              .replace(/&nbsp;/g, ' ')
+              .replace(/&amp;/g, '&')
+              .replace(/&lt;/g, '<')
+              .replace(/&gt;/g, '>')
+              .replace(/&quot;/g, '"')
+              .replace(/&#39;/g, "'")
+              .replace(/\n\s*\n\s*\n/g, '\n\n')
+              .trim();
+          };
+          
+          // Default color mapping
+          const getDefaultColor = (title: string, index: number): string => {
+            const titleLower = title.toLowerCase();
+            if (titleLower.includes('uptime') || titleLower.includes('sla') || titleLower.includes('reliability')) return 'green';
+            if (titleLower.includes('security') || titleLower.includes('safe') || titleLower.includes('encrypt')) return 'blue';
+            if (titleLower.includes('support') || titleLower.includes('help') || titleLower.includes('service')) return 'purple';
+            if (titleLower.includes('cdn') || titleLower.includes('delivery') || titleLower.includes('speed')) return 'pink';
+            // Default cycling
+            const defaultColors = ['green', 'blue', 'purple', 'pink'];
+            return defaultColors[index % defaultColors.length];
+          };
+          
+          const benefits = titles.map((title: string, index: number) => ({
+            title: title || '',
+            description: cleanDescription(descriptions[index] || ''),
+            icon: (icons[index] || '').toLowerCase().trim() || 'checkcircle',
+            color: (colors[index] || '').toLowerCase().trim() || getDefaultColor(title, index)
+          })).filter((b: any) => b.title);
+          
+          console.log('📊 Why Choose Platform benefits fetched:', benefits.length);
+          
+          return {
+            title: mainEntry.title || 'Why Choose Our Platform?',
+            description: mainEntry.description || 'Experience the power of next-generation content management',
+            benefits: benefits.length > 0 ? benefits : []
+          };
+        }
+      }
+      
+      console.warn('⚠️ No why choose platform entries found in Contentstack');
+      return null;
+    } catch (error) {
+      console.error('❌ Error fetching why choose platform content:', error);
       return null;
     }
   },

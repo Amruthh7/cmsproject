@@ -1,0 +1,20 @@
+{
+  "entry": {
+    "title": "Why Choose Our Platform?",
+    "description": "Experience the power of next-generation content management",
+    "benefit_title": [
+      "99.99% Uptime SLA",
+      "Enterprise Security",
+      "24/7 Support",
+      "Global CDN"
+    ],
+    "benefit_description": [
+      "Guaranteed uptime with our robust infrastructure and monitoring systems.",
+      "Bank-level security with SOC 2 Type II compliance and advanced encryption.",
+      "Round-the-clock expert support whenever you need assistance.",
+      "Lightning-fast content delivery across 100+ edge locations worldwide."
+    ],
+    "benefit_icon": [],
+    "benefit_color": []
+  }
+}

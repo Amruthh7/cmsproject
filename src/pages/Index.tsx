@@ -85,7 +85,7 @@ const Index = () => {
             </div>
 
             {/* Headline */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold mb-8 leading-relaxed tracking-normal">
               {heroTitle.split(' ').map((word, i, arr) => {
                 const wordLower = word.toLowerCase().replace(/[^a-z]/g, '');
                 const isDigital = wordLower === 'digital' || (arr[i-1] && arr[i-1].toLowerCase().includes('digital'));
